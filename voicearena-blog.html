@@ -1,0 +1,1533 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Naturalness Gap: What 44,000 Human Votes Reveal About TTS in the Real World — VoiceArena</title>
+<meta name="description" content="VoiceArena evaluated 9 TTS models across 6 languages with 44,387 pairwise human votes. The finding: models that sound passable in English systematically fall apart everywhere else. Here is the data.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,300;1,6..72,400&family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #07090f;
+    --bg-surface: #0d1117;
+    --bg-raised: #141b24;
+    --border: #1e2a38;
+    --border-subtle: #162030;
+    --text-primary: #dde4ee;
+    --text-secondary: #8a9bb5;
+    --text-muted: #4d6480;
+    --accent: #4f9cf9;
+    --accent-dim: #1a3558;
+    --amber: #f0a445;
+    --amber-dim: #2e1f0a;
+    --red: #e05a5a;
+    --red-dim: #2a1010;
+    --green: #4caf7d;
+    --green-dim: #0d2318;
+    --font-serif: 'Newsreader', Georgia, serif;
+    --font-sans: 'IBM Plex Sans', system-ui, sans-serif;
+    --font-mono: 'IBM Plex Mono', 'Courier New', monospace;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text-primary);
+    font-family: var(--font-sans);
+    font-size: 17px;
+    line-height: 1.7;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* NAV */
+  nav {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(7, 9, 15, 0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border-subtle);
+    padding: 0 24px;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .nav-brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+    color: var(--text-primary);
+    font-family: var(--font-mono);
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+  }
+
+  .nav-brand-dot {
+    width: 8px;
+    height: 8px;
+    background: var(--accent);
+    border-radius: 50%;
+    animation: pulse 2.5s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(0.85); }
+  }
+
+  .nav-links {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    list-style: none;
+  }
+
+  .nav-links a {
+    color: var(--text-secondary);
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 400;
+    letter-spacing: 0.03em;
+    transition: color 0.15s;
+  }
+  .nav-links a:hover { color: var(--text-primary); }
+
+  /* HERO */
+  .hero {
+    max-width: 780px;
+    margin: 0 auto;
+    padding: 80px 24px 56px;
+    animation: fadeUp 0.6s ease both;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .hero-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 28px;
+  }
+
+  .hero-label-line {
+    width: 24px;
+    height: 1px;
+    background: var(--accent);
+  }
+
+  .hero h1 {
+    font-family: var(--font-serif);
+    font-size: clamp(30px, 5vw, 46px);
+    font-weight: 400;
+    line-height: 1.18;
+    letter-spacing: -0.02em;
+    color: #f0f4fa;
+    margin-bottom: 20px;
+  }
+
+  .hero h1 em {
+    font-style: italic;
+    color: var(--amber);
+  }
+
+  .hero-subtitle {
+    font-size: 18px;
+    line-height: 1.6;
+    color: var(--text-secondary);
+    font-weight: 300;
+    max-width: 660px;
+    margin-bottom: 36px;
+  }
+
+  .hero-meta {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+    padding-top: 24px;
+    border-top: 1px solid var(--border-subtle);
+  }
+
+  .hero-meta-item {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+
+  .hero-meta-item span {
+    color: var(--text-secondary);
+  }
+
+  .hero-divider {
+    color: var(--border);
+  }
+
+  /* ARTICLE */
+  .article {
+    max-width: 780px;
+    margin: 0 auto;
+    padding: 0 24px 100px;
+  }
+
+  /* KEY FINDINGS BOX */
+  .findings-box {
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent);
+    border-radius: 6px;
+    padding: 28px 32px;
+    margin-bottom: 56px;
+    animation: fadeUp 0.7s 0.1s ease both;
+  }
+
+  .findings-box-title {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 18px;
+  }
+
+  .findings-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .findings-list li {
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+    font-size: 15px;
+    line-height: 1.55;
+    color: var(--text-secondary);
+  }
+
+  .findings-list li::before {
+    content: '→';
+    color: var(--accent);
+    font-family: var(--font-mono);
+    font-size: 13px;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  .findings-list strong {
+    color: var(--text-primary);
+    font-weight: 500;
+  }
+
+  /* SECTION HEADINGS */
+  .section {
+    margin-bottom: 56px;
+    animation: fadeUp 0.6s ease both;
+  }
+
+  h2 {
+    font-family: var(--font-serif);
+    font-size: clamp(20px, 3vw, 26px);
+    font-weight: 400;
+    line-height: 1.25;
+    letter-spacing: -0.015em;
+    color: #f0f4fa;
+    margin-bottom: 20px;
+    padding-top: 8px;
+  }
+
+  h3 {
+    font-family: var(--font-sans);
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--amber);
+    margin-bottom: 14px;
+    margin-top: 36px;
+  }
+
+  p {
+    color: var(--text-secondary);
+    margin-bottom: 18px;
+    font-weight: 300;
+  }
+
+  p strong {
+    color: var(--text-primary);
+    font-weight: 500;
+  }
+
+  p em {
+    font-family: var(--font-serif);
+    font-style: italic;
+    color: var(--text-primary);
+  }
+
+  a {
+    color: var(--accent);
+    text-decoration: none;
+    border-bottom: 1px solid var(--accent-dim);
+    transition: border-color 0.15s;
+  }
+
+  a:hover { border-color: var(--accent); }
+
+  /* TABLES */
+  .table-wrap {
+    overflow-x: auto;
+    margin: 28px 0;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: var(--font-mono);
+    font-size: 13px;
+  }
+
+  thead {
+    background: var(--bg-raised);
+    border-bottom: 1px solid var(--border);
+  }
+
+  thead th {
+    padding: 11px 16px;
+    text-align: left;
+    color: var(--text-muted);
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    font-size: 11px;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  tbody tr {
+    border-bottom: 1px solid var(--border-subtle);
+    transition: background 0.1s;
+  }
+
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:hover { background: var(--bg-surface); }
+
+  tbody td {
+    padding: 10px 16px;
+    color: var(--text-secondary);
+    white-space: nowrap;
+  }
+
+  .td-model {
+    color: var(--text-primary);
+    font-weight: 500;
+    font-size: 12px;
+  }
+
+  .td-best {
+    color: var(--green);
+    font-weight: 500;
+  }
+
+  .td-mid {
+    color: var(--amber);
+  }
+
+  .td-bad {
+    color: var(--red);
+    font-weight: 500;
+  }
+
+  .td-rank {
+    color: var(--text-muted);
+    font-size: 11px;
+  }
+
+  .row-highlight {
+    background: rgba(79, 156, 249, 0.04);
+  }
+
+  .row-warning {
+    background: rgba(224, 90, 90, 0.04);
+  }
+
+  /* STAT CALLOUTS */
+  .stat-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 16px;
+    margin: 28px 0;
+  }
+
+  .stat-card {
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 20px 20px 16px;
+  }
+
+  .stat-value {
+    font-family: var(--font-mono);
+    font-size: 28px;
+    font-weight: 500;
+    color: var(--text-primary);
+    line-height: 1;
+    margin-bottom: 6px;
+  }
+
+  .stat-value.bad { color: var(--red); }
+  .stat-value.good { color: var(--green); }
+  .stat-value.warn { color: var(--amber); }
+
+  .stat-label {
+    font-size: 12px;
+    color: var(--text-muted);
+    line-height: 1.4;
+  }
+
+  /* QUOTE / COMMENT BOX */
+  .comment-box {
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 20px 24px;
+    margin: 20px 0;
+  }
+
+  .comment-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+
+  .comment-tag {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 3px 8px;
+    border-radius: 3px;
+    font-weight: 500;
+  }
+
+  .tag-model { background: var(--accent-dim); color: var(--accent); }
+  .tag-lang { background: var(--amber-dim); color: var(--amber); }
+  .tag-defect { background: var(--red-dim); color: var(--red); }
+
+  .comment-text {
+    font-family: var(--font-serif);
+    font-size: 16px;
+    font-style: italic;
+    color: var(--text-primary);
+    line-height: 1.6;
+    font-weight: 300;
+  }
+
+  .comment-attribution {
+    margin-top: 10px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text-muted);
+  }
+
+  /* INLINE CODE */
+  code {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    background: var(--bg-raised);
+    border: 1px solid var(--border);
+    padding: 1px 6px;
+    border-radius: 3px;
+    color: var(--accent);
+  }
+
+  /* SECTION DIVIDER */
+  .section-divider {
+    border: none;
+    border-top: 1px solid var(--border-subtle);
+    margin: 56px 0;
+  }
+
+  /* HIGHLIGHT BOX */
+  .highlight-box {
+    background: var(--amber-dim);
+    border: 1px solid rgba(240, 164, 69, 0.25);
+    border-left: 3px solid var(--amber);
+    border-radius: 6px;
+    padding: 20px 24px;
+    margin: 24px 0;
+  }
+
+  .highlight-box p {
+    color: #c89060;
+    margin: 0;
+    font-size: 15px;
+    line-height: 1.6;
+  }
+
+  .highlight-box strong {
+    color: var(--amber) !important;
+  }
+
+  /* INFO BOX */
+  .info-box {
+    background: rgba(79, 156, 249, 0.04);
+    border: 1px solid rgba(79, 156, 249, 0.2);
+    border-radius: 6px;
+    padding: 20px 24px;
+    margin: 24px 0;
+  }
+
+  .info-box p {
+    color: #7aaad4;
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.6;
+  }
+
+  .info-box strong {
+    color: var(--accent) !important;
+  }
+
+  /* METHODOLOGY FOOTER */
+  .methodology {
+    margin-top: 64px;
+    padding-top: 32px;
+    border-top: 1px solid var(--border-subtle);
+  }
+
+  .methodology-title {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 16px;
+  }
+
+  .methodology p {
+    font-size: 13px;
+    color: var(--text-muted);
+    line-height: 1.6;
+  }
+
+  /* FOOTER */
+  footer {
+    border-top: 1px solid var(--border-subtle);
+    padding: 32px 24px;
+    text-align: center;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+
+  footer a { color: var(--text-muted); border-color: transparent; }
+  footer a:hover { color: var(--text-secondary); }
+
+  /* TABLE OF CONTENTS */
+  .toc {
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 22px 26px;
+    margin-bottom: 48px;
+  }
+
+  .toc-title {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-muted);
+    margin-bottom: 14px;
+  }
+
+  .toc-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    counter-reset: toc;
+  }
+
+  .toc-list li {
+    counter-increment: toc;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .toc-list li::before {
+    content: counter(toc, decimal-leading-zero);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text-muted);
+    min-width: 22px;
+  }
+
+  .toc-list a {
+    font-size: 14px;
+    color: var(--text-secondary);
+    border-bottom-color: transparent;
+    transition: color 0.15s;
+  }
+
+  .toc-list a:hover { color: var(--accent); }
+
+  /* HEATMAP TABLE */
+  .heatmap-note {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-top: 8px;
+    margin-bottom: 0;
+  }
+
+  /* LARGE CALLOUT NUMBER */
+  .big-number {
+    font-family: var(--font-mono);
+    font-size: 56px;
+    font-weight: 500;
+    color: var(--red);
+    line-height: 1;
+    margin-bottom: 4px;
+    display: block;
+  }
+
+  /* Responsive */
+  @media (max-width: 640px) {
+    .hero { padding: 48px 18px 40px; }
+    .article { padding: 0 18px 72px; }
+    .nav-links { display: none; }
+    .stat-row { grid-template-columns: 1fr 1fr; }
+    .findings-box { padding: 22px 20px; }
+  }
+
+  /* Footnotes */
+  sup {
+    font-size: 11px;
+    color: var(--accent);
+    font-family: var(--font-mono);
+  }
+
+  .footnotes {
+    margin-top: 40px;
+    font-size: 13px;
+    color: var(--text-muted);
+    line-height: 1.6;
+    border-top: 1px solid var(--border-subtle);
+    padding-top: 24px;
+  }
+
+  .footnotes p {
+    font-size: 13px;
+    color: var(--text-muted);
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="https://voicearena.com" class="nav-brand">
+    <div class="nav-brand-dot"></div>
+    VOICE ARENA
+  </a>
+  <ul class="nav-links">
+    <li><a href="https://voicearena.com">Leaderboard</a></li>
+    <li><a href="https://voicearena.com/vote">Arena</a></li>
+    <li><a href="https://voicearena.com/tts-methodology">Methodology</a></li>
+    <li><a href="https://ai.joshtalks.com">Josh Talks AI</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<header class="hero">
+  <div class="hero-label">
+    <span class="hero-label-line"></span>
+    Research · May 2026
+  </div>
+  <h1>The Naturalness Gap: What <em>44,000</em> Human Votes Reveal About TTS Beyond English</h1>
+  <p class="hero-subtitle">
+    We ran the largest multilingual pairwise TTS evaluation to date — 44,387 human votes across six languages, nine models, and four content domains. The finding is not a surprise, but the size of the problem is.
+  </p>
+  <div class="hero-meta">
+    <div class="hero-meta-item">VoiceArena · <span>Josh Talks AI</span></div>
+    <div class="hero-meta-item hero-divider">|</div>
+    <div class="hero-meta-item"><span>44,387</span> votes</div>
+    <div class="hero-meta-item hero-divider">|</div>
+    <div class="hero-meta-item"><span>6</span> languages</div>
+    <div class="hero-meta-item hero-divider">|</div>
+    <div class="hero-meta-item"><span>9</span> models</div>
+    <div class="hero-meta-item hero-divider">|</div>
+    <div class="hero-meta-item"><span>21,755</span> annotated votes</div>
+  </div>
+</header>
+
+<!-- ARTICLE -->
+<main class="article">
+
+  <!-- KEY FINDINGS -->
+  <div class="findings-box">
+    <div class="findings-box-title">// Key Findings</div>
+    <ul class="findings-list">
+      <li><strong>Robotic voice is the defining failure mode in non-English TTS.</strong> OpenAI gpt-4o-mini-tts has an 18% robotic voice rate in English. In Vietnamese it reaches 49.2%. In Hindi, 44.4%. This is not noise — it is a structural gap in how current models generalize naturalness across language families.</li>
+      <li><strong>Microsoft Azure Dragon HD Omni collapses in Japanese.</strong> Its robotic voice rate in English is 13.2%. In Japanese it hits 42.6%. Its mispronunciation rate in Japanese reaches 84.6% — the highest single-language defect rate measured in this evaluation.</li>
+      <li><strong>Speech hallucination is a real and underreported failure mode.</strong> xAI Grok TTS hallucinates extra content in 18% of Arabic evaluations, compared to 1.4% in English. Human evaluators flagged cases where the model invented numbers, added sounds not in the source text, and substituted words mid-sentence.</li>
+      <li><strong>Gemini 3.1 Flash TTS leads in all six languages</strong> with a consistent win rate between 40.8% (en-US) and 63% (ja-JP), and a robotic voice defect rate that stays between 6% and 10% regardless of language. 87–91% of its wins are clean — no defects tagged on its output.</li>
+      <li><strong>The hardest content category is customer support.</strong> Banking dispute, booking confirmation, and payment failure prompts show the highest defect rates across the entire dataset — driven primarily by failures in number reading, alphanumeric strings, and tonal naturalness under transactional pressure.</li>
+    </ul>
+  </div>
+
+  <!-- TOC -->
+  <div class="toc">
+    <div class="toc-title">// Contents</div>
+    <ol class="toc-list">
+      <li><a href="#why-multilingual">Why multilingual evaluation changes the picture</a></li>
+      <li><a href="#methodology">How VoiceArena measures preference</a></li>
+      <li><a href="#leaderboard">The overall leaderboard</a></li>
+      <li><a href="#naturalness-gap">The naturalness gap: robotic voice across languages</a></li>
+      <li><a href="#mispronunciation">The mispronunciation wall in Arabic and Japanese</a></li>
+      <li><a href="#hallucination">Hallucination: when TTS invents content</a></li>
+      <li><a href="#customer-support">The hardest content: customer support and structured data</a></li>
+      <li><a href="#human-comments">What the human comments reveal</a></li>
+      <li><a href="#gemini">Anatomy of a consistent winner</a></li>
+      <li><a href="#conclusion">What needs to happen next</a></li>
+    </ol>
+  </div>
+
+  <!-- SECTION 1 -->
+  <section class="section" id="why-multilingual">
+    <h2>Why Multilingual Evaluation Changes the Picture</h2>
+    <p>
+      Most published TTS benchmarks evaluate English. A few cover one or two additional languages. Almost none run the same models simultaneously across languages with enough scale to make statistically meaningful comparisons — and almost none give you the human comments that explain <em>why</em> one model was preferred.
+    </p>
+    <p>
+      This creates a blind spot. A model can perform well on English naturalness benchmarks, achieve a strong Elo rating in English arenas, and still sound noticeably robotic to a native Hindi or Vietnamese speaker. Without a multilingual evaluation running the same models against the same criteria, that gap stays invisible.
+    </p>
+    <p>
+      VoiceArena is built to close that gap. This report covers the current evaluation round: <strong>44,387 pairwise human votes across six languages</strong> — English (en-US), Hindi (hi-IN), Arabic (ar-MSA), Japanese (ja-JP), Portuguese Brazilian (pt-BR), and Vietnamese (vi-VN) — using a controlled set of 9 frontier TTS models. Approximately 49% of votes include written evaluator comments explaining the decision. The result is a dataset that lets you compare models not just on who won, but on how and why they lost.
+    </p>
+  </section>
+
+  <hr class="section-divider">
+
+  <!-- SECTION 2 -->
+  <section class="section" id="methodology">
+    <h2>How VoiceArena Measures Preference</h2>
+    <p>
+      VoiceArena uses pairwise evaluation. A human evaluator receives the same sentence, given to two different models. Both models generate audio. The evaluator listens to both and selects which they prefer — or marks a tie if neither is clearly better. Each vote produces one of three outcomes: <code>a_wins</code>, <code>b_wins</code>, or <code>tie</code>.
+    </p>
+    <p>
+      In addition to voting, evaluators tag specific defects on either or both outputs. The defect taxonomy covers: <code>unnatural_robotic_voice</code>, <code>mild_mispronunciation</code>, <code>severe_mispronunciation</code>, <code>irregular_pacing</code>, <code>hallucination_extra_content</code>, <code>missing_word</code>, and <code>noise_distortion</code>. Evaluators also write free-text comments in their native language, providing the qualitative signal that raw win rates cannot capture.
+    </p>
+    <p>
+      The evaluation sentences span four content domains — <strong>customer support and contact center</strong>, <strong>general conversation and AI assistants</strong>, <strong>media and entertainment</strong>, and <strong>content creation and education</strong> — with sub-buckets designed to include the kinds of inputs that routinely break TTS: numbers, alphanumeric identifiers, mixed-language text, filler words, and emotionally inflected speech. All model pairings are anonymized to the evaluator.
+    </p>
+    <div class="info-box">
+      <p>
+        <strong>A note on defect rates:</strong> Defect tags are applied independently by each evaluator and represent perceptual observations, not automated metrics. They are not mutually exclusive — a single output can receive multiple tags. Defect rates in this report are normalized by model appearances (total number of votes in which the model participated on that side), not by total votes.
+      </p>
+    </div>
+  </section>
+
+  <hr class="section-divider">
+
+  <!-- SECTION 3: LEADERBOARD -->
+  <section class="section" id="leaderboard">
+    <h2>The Overall Leaderboard</h2>
+    <p>
+      The table below shows win rates — the percentage of non-tie matchups a model wins — for each model across all six languages. Models are sorted by cross-language average. Win rate is the most direct signal of overall preference; a higher number means human evaluators consistently chose that model's output over a randomly assigned opponent.
+    </p>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Model</th>
+            <th>en-US</th>
+            <th>hi-IN</th>
+            <th>ar-MSA</th>
+            <th>ja-JP</th>
+            <th>pt-BR</th>
+            <th>vi-VN</th>
+            <th>Avg</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="row-highlight">
+            <td class="td-rank">1</td>
+            <td class="td-model">Google DeepMind Gemini 3.1 Flash TTS</td>
+            <td class="td-best">40.8%</td>
+            <td class="td-best">52.2%</td>
+            <td class="td-best">61.5%</td>
+            <td class="td-best">63.0%</td>
+            <td class="td-best">49.5%</td>
+            <td class="td-best">50.6%</td>
+            <td class="td-best">52.9%</td>
+          </tr>
+          <tr>
+            <td class="td-rank">2</td>
+            <td class="td-model">ElevenLabs Eleven v3</td>
+            <td class="td-mid">30.0%</td>
+            <td class="td-mid">45.1%</td>
+            <td class="td-mid">41.0%</td>
+            <td class="td-mid">46.7%</td>
+            <td class="td-mid">41.6%</td>
+            <td class="td-mid">43.6%</td>
+            <td class="td-mid">41.3%</td>
+          </tr>
+          <tr>
+            <td class="td-rank">3</td>
+            <td class="td-model">Cartesia Sonic-3</td>
+            <td>13.5%</td>
+            <td>34.1%</td>
+            <td>21.0%</td>
+            <td>18.8%</td>
+            <td>31.1%</td>
+            <td>29.9%</td>
+            <td>24.7%</td>
+          </tr>
+          <tr>
+            <td class="td-rank">4</td>
+            <td class="td-model">OpenAI gpt-4o-mini-tts</td>
+            <td>21.0%</td>
+            <td>17.6%</td>
+            <td>24.5%</td>
+            <td>34.9%</td>
+            <td>26.8%</td>
+            <td>15.2%</td>
+            <td>23.3%</td>
+          </tr>
+          <tr>
+            <td class="td-rank">5</td>
+            <td class="td-model">xAI Grok TTS</td>
+            <td>28.5%</td>
+            <td>23.7%</td>
+            <td>19.6%</td>
+            <td>16.2%</td>
+            <td>18.7%</td>
+            <td>28.4%</td>
+            <td>22.5%</td>
+          </tr>
+          <tr class="row-warning">
+            <td class="td-rank">6</td>
+            <td class="td-model">Microsoft Azure Dragon HD Omni</td>
+            <td>24.3%</td>
+            <td>19.4%</td>
+            <td>20.4%</td>
+            <td class="td-bad">8.0%</td>
+            <td>19.0%</td>
+            <td>22.9%</td>
+            <td>19.0%</td>
+          </tr>
+          <tr>
+            <td class="td-rank">7</td>
+            <td class="td-model">MiniMax Speech 2.8 HD</td>
+            <td>—</td>
+            <td>31.0%</td>
+            <td>27.3%</td>
+            <td>—</td>
+            <td>15.6%</td>
+            <td>23.5%</td>
+            <td>24.4%</td>
+          </tr>
+          <tr>
+            <td class="td-rank">8</td>
+            <td class="td-model">Sarvam AI Bulbul-V3</td>
+            <td>—</td>
+            <td>33.3%</td>
+            <td>—</td>
+            <td>—</td>
+            <td>—</td>
+            <td>—</td>
+            <td>33.3%</td>
+          </tr>
+          <tr>
+            <td class="td-rank">9</td>
+            <td class="td-model">Fish Audio S2 Pro</td>
+            <td>22.4%</td>
+            <td>—</td>
+            <td>—</td>
+            <td>—</td>
+            <td>—</td>
+            <td>—</td>
+            <td>22.4%</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="heatmap-note">// Win rate = wins ÷ (wins + losses), excluding ties. "—" = model not evaluated in this language round.</p>
+
+    <p>
+      The ranking gap between first and second place — Gemini at 52.9% average versus ElevenLabs at 41.3% — is meaningful. The gap between second and third is smaller but still consistent. Below the top two, the ordering is less stable: OpenAI ranks fourth overall but second in Japanese; Cartesia ranks third overall but last in English; Azure ranks last overall despite a mid-table English showing.
+    </p>
+    <p>
+      The variance in a model's ranking across languages is itself informative. A model that ranks consistently across languages is doing something architecturally different from one whose ranking swings by three to four positions depending on the language. That variance is what this report is primarily about.
+    </p>
+  </section>
+
+  <hr class="section-divider">
+
+  <!-- SECTION 4: NATURALNESS GAP -->
+  <section class="section" id="naturalness-gap">
+    <h2>The Naturalness Gap: Robotic Voice Across Languages</h2>
+    <p>
+      The single most pervasive failure mode in this dataset is <strong>unnatural or robotic voice</strong> — the judgment that a model's output sounds like a machine rather than a person. In English, most frontier models have brought this defect rate to manageable levels. Outside English, the numbers look very different.
+    </p>
+
+    <div class="stat-row">
+      <div class="stat-card">
+        <div class="stat-value bad">49.2%</div>
+        <div class="stat-label">OpenAI gpt-4o-mini-tts<br>robotic voice rate — vi-VN</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value bad">44.4%</div>
+        <div class="stat-label">OpenAI gpt-4o-mini-tts<br>robotic voice rate — hi-IN</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value warn">18.0%</div>
+        <div class="stat-label">OpenAI gpt-4o-mini-tts<br>robotic voice rate — en-US</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value good">8.1%</div>
+        <div class="stat-label">Gemini 3.1 Flash TTS<br>robotic voice rate — average</div>
+      </div>
+    </div>
+
+    <p>
+      The table below shows robotic voice defect rates for all models across all six languages. These are normalized per model appearance — the proportion of times a model was flagged with <code>unnatural_robotic_voice</code> out of all evaluations in which it participated.
+    </p>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Model</th>
+            <th>en-US</th>
+            <th>hi-IN</th>
+            <th>ar-MSA</th>
+            <th>ja-JP</th>
+            <th>pt-BR</th>
+            <th>vi-VN</th>
+            <th>Avg</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="row-warning">
+            <td class="td-model">OpenAI gpt-4o-mini-tts</td>
+            <td>18.0%</td>
+            <td class="td-bad">44.4%</td>
+            <td>24.9%</td>
+            <td>30.4%</td>
+            <td>26.8%</td>
+            <td class="td-bad">49.2%</td>
+            <td class="td-bad">32.3%</td>
+          </tr>
+          <tr class="row-warning">
+            <td class="td-model">Microsoft Azure Dragon HD Omni</td>
+            <td>13.2%</td>
+            <td>36.1%</td>
+            <td>25.6%</td>
+            <td class="td-bad">42.6%</td>
+            <td>36.9%</td>
+            <td>37.6%</td>
+            <td class="td-bad">32.0%</td>
+          </tr>
+          <tr>
+            <td class="td-model">MiniMax Speech 2.8 HD</td>
+            <td>—</td>
+            <td>20.8%</td>
+            <td>20.3%</td>
+            <td>—</td>
+            <td>22.1%</td>
+            <td>25.3%</td>
+            <td class="td-mid">22.1%</td>
+          </tr>
+          <tr>
+            <td class="td-model">xAI Grok TTS</td>
+            <td>8.5%</td>
+            <td>29.0%</td>
+            <td>13.9%</td>
+            <td>21.2%</td>
+            <td>17.0%</td>
+            <td>17.1%</td>
+            <td class="td-mid">17.8%</td>
+          </tr>
+          <tr>
+            <td class="td-model">Cartesia Sonic-3</td>
+            <td>21.1%</td>
+            <td>15.9%</td>
+            <td>16.9%</td>
+            <td>20.2%</td>
+            <td>9.5%</td>
+            <td>10.9%</td>
+            <td>15.8%</td>
+          </tr>
+          <tr>
+            <td class="td-model">ElevenLabs Eleven v3</td>
+            <td>13.7%</td>
+            <td>8.0%</td>
+            <td>7.2%</td>
+            <td>6.1%</td>
+            <td>5.1%</td>
+            <td>4.2%</td>
+            <td class="td-best">7.4%</td>
+          </tr>
+          <tr class="row-highlight">
+            <td class="td-model">Google DeepMind Gemini 3.1 Flash TTS</td>
+            <td>7.5%</td>
+            <td>9.8%</td>
+            <td>5.9%</td>
+            <td>6.7%</td>
+            <td>9.6%</td>
+            <td>9.2%</td>
+            <td class="td-best">8.1%</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="heatmap-note">// Robotic voice defect rate = appearances flagged as unnatural_robotic_voice ÷ total model appearances per language.</p>
+
+    <p>
+      Two patterns stand out immediately.
+    </p>
+    <p>
+      First, the <strong>language sensitivity of naturalness varies enormously across models</strong>. Gemini's robotic voice rate stays between 5.9% and 9.8% across all six languages — a difference of roughly 4 percentage points between its best and worst language. OpenAI's range is 18% to 49.2% — a 31-point spread. Microsoft Azure's range is 13.2% to 42.6% — a 29-point spread. For these models, "naturalness" is not a general capability that transfers across languages; it is an English-specific property that degrades sharply elsewhere.
+    </p>
+    <p>
+      Second, <strong>the worst-affected language varies by model</strong>. OpenAI collapses most severely in Vietnamese and Hindi. Azure collapses most severely in Japanese and Portuguese. These differences likely reflect differences in training data composition, prosody modeling for each language family, and how well each model has internalized the phonological constraints specific to each language.
+    </p>
+
+    <div class="highlight-box">
+      <p>
+        <strong>The practical implication:</strong> A model's English naturalness score is not a reliable predictor of its behavior in other languages. Teams deploying TTS at scale in multilingual products are operating partially blind without language-specific evaluations using native speaker annotators — which is exactly what this data provides.
+      </p>
+    </div>
+
+    <h3>Cartesia's Pacing Problem in English</h3>
+    <p>
+      One anomaly worth flagging: <strong>Cartesia Sonic-3 shows an unusually high irregular pacing defect rate specifically in English</strong> — 32.5%, the highest of any model in any single language for this defect type. Its robotic voice rate in English is also 21.1%, higher than in any other language it was evaluated on.
+    </p>
+    <p>
+      Human comments in the English dataset repeatedly flag specific pacing failures: pauses inserted at wrong positions within tokens, rushed delivery of numbers, and rhythm breakdowns at special characters like underscores and hyphens. These patterns suggest a structural issue with how Cartesia handles the specific kinds of mixed-format content (usernames, identifiers, filler words) that appear frequently in the evaluation set — not a general voice quality problem, but a specific prosodic failure mode at symbol and number boundaries.
+    </p>
+  </section>
+
+  <hr class="section-divider">
+
+  <!-- SECTION 5: MISPRONUNCIATION -->
+  <section class="section" id="mispronunciation">
+    <h2>The Mispronunciation Wall in Arabic and Japanese</h2>
+    <p>
+      If naturalness is the leading failure mode in Hindi and Vietnamese, <strong>mispronunciation is the defining failure mode in Arabic and Japanese</strong>. These two language families impose phonological demands — Arabic's short vowel system and geminate consonants; Japanese's pitch accent, mora timing, and mixed script reading — that expose clear boundaries in current TTS capability.
+    </p>
+    <p>
+      The table below shows combined mispronunciation rates (mild and severe) per model across languages.
+    </p>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Model</th>
+            <th>en-US</th>
+            <th>hi-IN</th>
+            <th>ar-MSA</th>
+            <th>ja-JP</th>
+            <th>pt-BR</th>
+            <th>vi-VN</th>
+            <th>Avg</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="row-warning">
+            <td class="td-model">Microsoft Azure Dragon HD Omni</td>
+            <td>9.2%</td>
+            <td>43.7%</td>
+            <td>59.3%</td>
+            <td class="td-bad">84.6%</td>
+            <td>22.2%</td>
+            <td>23.8%</td>
+            <td class="td-bad">40.5%</td>
+          </tr>
+          <tr class="row-warning">
+            <td class="td-model">xAI Grok TTS</td>
+            <td>7.3%</td>
+            <td>35.9%</td>
+            <td class="td-bad">66.0%</td>
+            <td class="td-bad">69.3%</td>
+            <td>32.7%</td>
+            <td>34.6%</td>
+            <td class="td-bad">41.0%</td>
+          </tr>
+          <tr>
+            <td class="td-model">Cartesia Sonic-3</td>
+            <td>9.0%</td>
+            <td>28.8%</td>
+            <td>67.1%</td>
+            <td>48.2%</td>
+            <td>20.0%</td>
+            <td>12.8%</td>
+            <td>31.0%</td>
+          </tr>
+          <tr>
+            <td class="td-model">OpenAI gpt-4o-mini-tts</td>
+            <td>7.4%</td>
+            <td>35.2%</td>
+            <td>49.9%</td>
+            <td>33.6%</td>
+            <td>13.7%</td>
+            <td>21.9%</td>
+            <td>27.0%</td>
+          </tr>
+          <tr>
+            <td class="td-model">ElevenLabs Eleven v3</td>
+            <td>6.0%</td>
+            <td>22.1%</td>
+            <td>36.3%</td>
+            <td>34.9%</td>
+            <td>10.6%</td>
+            <td>10.2%</td>
+            <td>20.0%</td>
+          </tr>
+          <tr class="row-highlight">
+            <td class="td-model">Google DeepMind Gemini 3.1 Flash TTS</td>
+            <td>4.7%</td>
+            <td>11.6%</td>
+            <td>14.8%</td>
+            <td>15.9%</td>
+            <td>6.4%</td>
+            <td>6.0%</td>
+            <td class="td-best">9.9%</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="heatmap-note">// Combined mild + severe mispronunciation rate, normalized by model appearances per language.</p>
+
+    <p>
+      Microsoft Azure's Japanese mispronunciation rate — 84.6% — deserves attention. In practical terms, this means that in nearly nine out of ten Japanese evaluations, annotators observed at least one pronunciation error in Azure's output. Human evaluators flagged issues including incorrect pitch accent on compound words, numbers being read in English rather than Japanese phonology, and technical terms being misrendered across the script boundary.
+    </p>
+
+    <div class="comment-box">
+      <div class="comment-header">
+        <span class="comment-tag tag-model">Azure Dragon HD</span>
+        <span class="comment-tag tag-lang">ja-JP</span>
+        <span class="comment-tag tag-defect">severe_mispronunciation</span>
+      </div>
+      <div class="comment-text">"There are three mispronunciations for 信濃川, 新潟県, and 甲武信ヶ岳, and furthermore, the speaking comes with irregular tones and accents to the end."</div>
+      <div class="comment-attribution">— Evaluator annotation, ja-JP customer support evaluation</div>
+    </div>
+
+    <div class="comment-box">
+      <div class="comment-header">
+        <span class="comment-tag tag-model">Azure Dragon HD</span>
+        <span class="comment-tag tag-lang">ja-JP</span>
+        <span class="comment-tag tag-defect">severe_mispronunciation</span>
+      </div>
+      <div class="comment-text">"F = m × a は、えふいこーるえむかけるえー。えふえむむごーあえーと読んでいる。イントネーションが不自然。" <em>(The formula F = m × a is read as 'F equals M times A' but the model reads it differently. Intonation is unnatural.)</em></div>
+      <div class="comment-attribution">— Evaluator annotation, ja-JP STEM education evaluation</div>
+    </div>
+
+    <p>
+      Arabic presents a different but equally significant challenge. The evaluation includes Modern Standard Arabic with diacritics marking vowel sounds that must be preserved in correct pronunciation. Models that perform well on undiacritized Arabic text still frequently fail on diacritized input, suggesting that diacritic-aware grapheme-to-phoneme conversion is not uniformly reliable across the models evaluated.
+    </p>
+
+    <p>
+      Notably, <strong>Gemini's mispronunciation rate in Arabic (14.8%) and Japanese (15.9%) is 3–5× lower than the next-best model in those languages</strong>. Given that Arabic and Japanese impose some of the highest demands on pronunciation systems, this gap suggests a meaningful difference in how well the underlying model has been trained on non-Latin script phonology — not just surface-level text-to-phoneme lookup, but prosodic and contextual correctness.
+    </p>
+  </section>
+
+  <hr class="section-divider">
+
+  <!-- SECTION 6: HALLUCINATION -->
+  <section class="section" id="hallucination">
+    <h2>Hallucination: When TTS Invents Content</h2>
+    <p>
+      Hallucination in large language models — generating content not grounded in the input — is well-studied. Hallucination in TTS is not. The VoiceArena defect taxonomy includes <code>hallucination_extra_content</code>, defined as audio output that contains words, sounds, or content not present in the source text. Human evaluators flagged this defect 5,236 times across the full dataset.
+    </p>
+    <p>
+      The language distribution of hallucination is highly uneven.
+    </p>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Model</th>
+            <th>en-US</th>
+            <th>hi-IN</th>
+            <th>ar-MSA</th>
+            <th>ja-JP</th>
+            <th>pt-BR</th>
+            <th>vi-VN</th>
+            <th>Avg</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="row-warning">
+            <td class="td-model">xAI Grok TTS</td>
+            <td>1.4%</td>
+            <td>10.5%</td>
+            <td class="td-bad">18.0%</td>
+            <td>10.3%</td>
+            <td>9.7%</td>
+            <td>8.9%</td>
+            <td class="td-bad">9.8%</td>
+          </tr>
+          <tr>
+            <td class="td-model">Microsoft Azure Dragon HD Omni</td>
+            <td>2.1%</td>
+            <td>8.1%</td>
+            <td>12.6%</td>
+            <td>7.0%</td>
+            <td>3.1%</td>
+            <td>2.0%</td>
+            <td>5.8%</td>
+          </tr>
+          <tr>
+            <td class="td-model">Cartesia Sonic-3</td>
+            <td>2.4%</td>
+            <td>7.3%</td>
+            <td>8.7%</td>
+            <td>6.2%</td>
+            <td>6.5%</td>
+            <td>2.6%</td>
+            <td>5.6%</td>
+          </tr>
+          <tr>
+            <td class="td-model">OpenAI gpt-4o-mini-tts</td>
+            <td>1.7%</td>
+            <td>9.4%</td>
+            <td>10.5%</td>
+            <td>3.1%</td>
+            <td>3.2%</td>
+            <td>3.7%</td>
+            <td>5.3%</td>
+          </tr>
+          <tr>
+            <td class="td-model">ElevenLabs Eleven v3</td>
+            <td>1.4%</td>
+            <td>4.7%</td>
+            <td>8.2%</td>
+            <td>3.5%</td>
+            <td>3.9%</td>
+            <td>2.1%</td>
+            <td>4.0%</td>
+          </tr>
+          <tr class="row-highlight">
+            <td class="td-model">Google DeepMind Gemini 3.1 Flash TTS</td>
+            <td>1.7%</td>
+            <td>4.0%</td>
+            <td>3.9%</td>
+            <td>1.2%</td>
+            <td>2.5%</td>
+            <td>2.0%</td>
+            <td class="td-best">2.6%</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="heatmap-note">// Hallucination rate = appearances flagged as hallucination_extra_content ÷ total model appearances per language.</p>
+
+    <p>
+      <strong>xAI Grok TTS hallucinates extra content in 18% of Arabic evaluations</strong>, compared to 1.4% in English. In absolute terms: in roughly one in five Arabic evaluations where Grok participated, a human listener flagged something in the audio that was not in the source text. The hallucination types documented in comments include: invented numbers, substituted words, added filler sounds, and cases where the model vocalized punctuation as content.
+    </p>
+
+    <div class="comment-box">
+      <div class="comment-header">
+        <span class="comment-tag tag-model">xAI Grok TTS</span>
+        <span class="comment-tag tag-lang">ar-MSA</span>
+        <span class="comment-tag tag-defect">hallucination_extra_content</span>
+      </div>
+      <div class="comment-text">"هناك صوت ضحكات لم تكن في النص الاصلي" <em>(There are laugh sounds that were not in the original text.)</em></div>
+      <div class="comment-attribution">— Evaluator annotation, ar-MSA media and entertainment evaluation</div>
+    </div>
+
+    <div class="comment-box">
+      <div class="comment-header">
+        <span class="comment-tag tag-model">xAI Grok TTS</span>
+        <span class="comment-tag tag-lang">ar-MSA</span>
+        <span class="comment-tag tag-defect">hallucination_extra_content + severe_mispronunciation</span>
+      </div>
+      <div class="comment-text">"Wrong number in saying 1422. She said it as '2na410'. Extra content in adding the sound 'أه' [a filler vocalization not in the source text]."</div>
+      <div class="comment-attribution">— Evaluator annotation, ar-MSA customer support evaluation</div>
+    </div>
+
+    <p>
+      These are not edge cases. The 18% rate means that in the Arabic portion of this evaluation, Grok TTS was flagged for hallucination more often than it was flagged for any defect type other than mispronunciation. This has direct implications for deployment in Arabic customer service, where numbers, dates, reference codes, and transaction identifiers must be reproduced exactly.
+    </p>
+    <p>
+      Why is hallucination so much higher in Arabic? There are several plausible explanations: sparser Arabic training data leading to less reliable text-to-phoneme alignment, greater ambiguity in unvoweled Arabic script (where a sequence of consonants can resolve to multiple words), and higher sensitivity to diacritic presence or absence causing the model to substitute or interpolate content. Disambiguating these causes requires deeper internal analysis than this evaluation can provide — but the behavioral signal is clear.
+    </p>
+  </section>
+
+  <hr class="section-divider">
+
+  <!-- SECTION 7: CUSTOMER SUPPORT -->
+  <section class="section" id="customer-support">
+    <h2>The Hardest Content: Customer Support and Structured Data</h2>
+    <p>
+      Not all content is equally hard for TTS. The evaluation was designed with this in mind: sentences span four broad categories and more than twenty sub-buckets, from short conversational exchanges to IVR scripts with alphanumeric identifiers.
+    </p>
+    <p>
+      The data is consistent: <strong>customer support and contact center content generates the highest defect rates in the evaluation, across all languages.</strong>
+    </p>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Content Category</th>
+            <th>Total Votes</th>
+            <th>Tie Rate</th>
+            <th>Defects per Vote</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="row-warning">
+            <td class="td-model">Customer support &amp; contact center</td>
+            <td>16,065</td>
+            <td>38.2%</td>
+            <td class="td-bad">1.645</td>
+          </tr>
+          <tr>
+            <td class="td-model">Media &amp; entertainment</td>
+            <td>10,102</td>
+            <td>40.3%</td>
+            <td>1.534</td>
+          </tr>
+          <tr>
+            <td class="td-model">Content creation &amp; education</td>
+            <td>8,910</td>
+            <td>41.1%</td>
+            <td>1.406</td>
+          </tr>
+          <tr>
+            <td class="td-model">Gen-conv &amp; AI assistants</td>
+            <td>9,310</td>
+            <td>41.0%</td>
+            <td>1.376</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="heatmap-note">// Defects per vote = total defect tag instances ÷ total votes in that category.</p>
+
+    <p>
+      Drilling into sub-buckets, the highest defect rates in the entire evaluation are: <em>Banking duplicate-charge dispute</em> (2.33 defects/vote), <em>Commercial license PA</em> (2.35 defects/vote), <em>AI assistant — financial transfer confirmation</em> (2.15 defects/vote), and <em>E-commerce — return window expired</em> (2.06 defects/vote). All are contexts where natural delivery of numbers, account identifiers, and dates is critical to the information being understood.
+    </p>
+
+    <p>
+      Human comments from these categories are highly specific. The most common failure pattern is <strong>number reading</strong>: models collapsing digit sequences into compound numbers ("forty-four" instead of "four, four"), merging alphanumeric identifiers ("CHI" spoken as "ki" instead of "C-H-I"), or switching between reading registers mid-string (saying "USF" as a word rather than spelling it).
+    </p>
+
+    <div class="comment-box">
+      <div class="comment-header">
+        <span class="comment-tag tag-model">Microsoft Azure Dragon HD</span>
+        <span class="comment-tag tag-lang">en-US</span>
+        <span class="comment-tag tag-defect">mild_mispronunciation</span>
+      </div>
+      <div class="comment-text">"The model merged the letters CHI in the booking ID together. Instead of saying them individually, as C, H, I, it pronounced them as 'ki'. It also said the numbers together as 'forty three fifty one' when they should have been said individually as four, three, five, one."</div>
+      <div class="comment-attribution">— Evaluator annotation, en-US customer support evaluation</div>
+    </div>
+
+    <div class="comment-box">
+      <div class="comment-header">
+        <span class="comment-tag tag-model">Cartesia Sonic-3</span>
+        <span class="comment-tag tag-lang">en-US</span>
+        <span class="comment-tag tag-defect">irregular_pacing</span>
+      </div>
+      <div class="comment-text">"The audio is clear. The model pauses in between saying 'maddie' and 'underscore' which affects the rhythm and throws off the pacing and makes it sound robotic at that part of the clip."</div>
+      <div class="comment-attribution">— Evaluator annotation, en-US customer support evaluation</div>
+    </div>
+
+    <p>
+      These failures are not cosmetic. In an IVR or customer support voice assistant, misread account numbers directly break functionality. The fact that these failures appear consistently — across models, across languages, across annotators — suggests a persistent gap in how current TTS systems handle structured data embedded in natural language.
+    </p>
+  </section>
+
+  <hr class="section-divider">
+
+  <!-- SECTION 8: HUMAN COMMENTS -->
+  <section class="section" id="human-comments">
+    <h2>What the Human Comments Reveal</h2>
+    <p>
+      The VoiceArena vote log contains 21,755 annotated votes — evaluations where the human rater wrote a comment in addition to selecting a winner and tagging defects. These comments are written in the language of evaluation, by native speakers, and they reveal patterns that defect tags alone cannot capture.
+    </p>
+
+    <h3>Filler words and conversational register</h3>
+    <p>
+      Many evaluation sentences contain intentional filler words: <em>uhh</em>, <em>umm</em>, <em>uh</em>, and their equivalents in Arabic, Hindi, Vietnamese, and Japanese. These are not errors in the source text — they are deliberate markers of natural spoken register, testing whether models can render disfluency-as-naturalness rather than treating filler as something to remove or roboticize.
+    </p>
+    <p>
+      Comments on filler word handling appear repeatedly in the English dataset. Evaluators consistently distinguished between models that rendered fillers naturally (contributing to the impression of a real person) and models that either over-stretched them, delivered them at unnatural pitch, or inserted a pacing break that made the filler feel like a glitch rather than a breath.
+    </p>
+
+    <div class="comment-box">
+      <div class="comment-header">
+        <span class="comment-tag tag-model">OpenAI gpt-4o-mini-tts</span>
+        <span class="comment-tag tag-lang">en-US</span>
+        <span class="comment-tag tag-defect">irregular_pacing</span>
+      </div>
+      <div class="comment-text">"The audio stretches out the 'Uhhhhh' at the beginning a little too long, which is throwing off the pacing."</div>
+      <div class="comment-attribution">— Evaluator annotation, en-US customer support evaluation</div>
+    </div>
+
+    <p>In Vietnamese, annotators flagged the same class of failure in their own language:</p>
+
+    <div class="comment-box">
+      <div class="comment-header">
+        <span class="comment-tag tag-model">OpenAI gpt-4o-mini-tts</span>
+        <span class="comment-tag tag-lang">vi-VN</span>
+        <span class="comment-tag tag-defect">unnatural_robotic_voice</span>
+      </div>
+      <div class="comment-text">"Ngữ điệu không giống người bản xứ" <em>(Intonation doesn't sound like a native speaker.)</em></div>
+      <div class="comment-attribution">— Evaluator annotation, vi-VN general conversation evaluation</div>
+    </div>
+
+    <h3>Tone and emotional register</h3>
+    <p>
+      Evaluators in the English dataset repeatedly referenced tone as distinct from pronunciation and pacing — the judgment that a voice sounds "over the top," "monotone," "too squeaky," or "like a TV commercial." These comments describe a real perceptual phenomenon: correct pronunciation and appropriate pacing are necessary but not sufficient for natural delivery. Register — how formal, warm, urgent, or casual the voice sounds — must also fit the context.
+    </p>
+    <p>
+      One evaluator, commenting on a customer support evaluation where a model won despite no technical flaws: <em>"Well done, good pace, good pausing, the directions are clearly spoken and sound very natural."</em> Another, losing the same matchup for a competing model: <em>"It sounds like a voice you would hear in a TV commercial — too squeaky, too emotional for the subject."</em> Both outputs were technically correct. The preference was about emotional calibration.
+    </p>
+
+    <h3>The Japanese evaluator pattern</h3>
+    <p>
+      Japanese evaluators wrote some of the most technically specific comments in the entire dataset. In a language where number reading conventions (reading four-digit numbers digit-by-digit versus as a compound), pitch accent, and loan-word pronunciation rules are complex and culturally important, evaluators flagged errors at a level of precision that reveals how high the bar is for a Japanese-native listener.
+    </p>
+
+    <div class="comment-box">
+      <div class="comment-header">
+        <span class="comment-tag tag-model">Microsoft Azure Dragon HD</span>
+        <span class="comment-tag tag-lang">ja-JP</span>
+        <span class="comment-tag tag-defect">severe_mispronunciation</span>
+      </div>
+      <div class="comment-text">"14時40分を、じゅうよんじよんじゅっぷん、と読んでいる。" <em>(14:40 is being read as 'juu-yon-ji-yon-juppun', which is incorrect.)</em></div>
+      <div class="comment-attribution">— Evaluator annotation, ja-JP customer support evaluation</div>
+    </div>
+
+    <p>
+      In 42.2% of Japanese evaluation matchups, both models in the comparison received at least one defect tag — the highest "both defective" rate of any language in the dataset. The practical meaning: in Japanese evaluation, it is not uncommon for a model to win a matchup while still being considered imperfect. The question becomes not "which model was good?" but "which model was less broken?"
+    </p>
+  </section>
+
+  <hr class="section-divider">
+
+  <!-- SECTION 9: GEMINI -->
+  <section class="section" id="gemini">
+    <h2>Anatomy of a Consistent Winner</h2>
+    <p>
+      Gemini 3.1 Flash TTS wins more matchups than any other model in every language evaluated. The more interesting question is <em>how</em> it wins — and what that reveals about what separates a genuinely multilingual TTS system from one that has generalized English capabilities to some non-English settings.
+    </p>
+
+    <div class="stat-row">
+      <div class="stat-card">
+        <div class="stat-value good">52.9%</div>
+        <div class="stat-label">Average win rate<br>across 6 languages</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value good">8.1%</div>
+        <div class="stat-label">Average robotic voice<br>defect rate</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value good">9.9%</div>
+        <div class="stat-label">Average mispronunciation<br>defect rate</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value good">88.6%</div>
+        <div class="stat-label">Wins with no defects<br>tagged (avg. across langs)</div>
+      </div>
+    </div>
+
+    <p>
+      The fourth number — <strong>88.6% of Gemini's wins are clean</strong>, meaning the model won without any defect being tagged on its output — is particularly telling. It ranges from 82.1% in Japanese to 91.5% in English. For comparison, the models with the lowest defect-free win rates win significantly more of their matchups with at least one defect on the board. Gemini is not winning by being the less bad option; it is winning because its outputs are consistently cleaner.
+    </p>
+    <p>
+      Two properties of Gemini's profile stand out. First, <strong>its defect rates are stable across languages</strong>: robotic voice stays between 5.9% and 9.8%; mispronunciation stays between 4.7% and 15.9%. Other models show 3–5× variation across those same dimensions. Stability suggests that Gemini's multilingual training has produced representations of naturalness that generalize, rather than English-specific prosodic patterns that degrade on other phonological systems.
+    </p>
+    <p>
+      Second, <strong>Gemini leads most strongly in the languages where other models fail most badly</strong>: Arabic (61.5% win rate), Japanese (63.0% win rate). These are the languages with the highest mispronunciation rates, the most complex grapheme-to-phoneme rules, and the highest rates of "both models defective" matchups. Where the evaluation is hardest, the margin in Gemini's favor is largest.
+    </p>
+    <p>
+      This report does not explain why Gemini performs this way — that would require access to training details and architecture decisions not publicly available. What the data shows is that the performance gap is consistent, large, and not confined to a single dimension or language family.
+    </p>
+  </section>
+
+  <hr class="section-divider">
+
+  <!-- SECTION 10: CONCLUSION -->
+  <section class="section" id="conclusion">
+    <h2>What Needs to Happen Next</h2>
+    <p>
+      The findings from this evaluation converge on a few conclusions that are relevant for teams building, evaluating, or deploying TTS at scale.
+    </p>
+    <p>
+      <strong>English performance is not a proxy for multilingual performance.</strong> Across nearly every model in this evaluation, there is a large and meaningful degradation between English defect rates and defect rates in Hindi, Vietnamese, Arabic, and Japanese. Robotic voice — the most basic measure of naturalness — can more than double or triple when moving from English to Southeast Asian or South Asian languages. Teams that deploy models globally based on English evaluations are accepting an unknown performance risk in every non-English language they operate in.
+    </p>
+    <p>
+      <strong>The defect profile varies by language family in predictable ways.</strong> Arabic and Japanese expose mispronunciation and hallucination failures at rates that other languages do not. Hindi and Vietnamese expose naturalness failures. Portuguese and Arabic both expose robotic voice problems, but the leading models are different. This structure suggests that language-specific improvements are possible and that the failure modes are not randomly distributed — they reflect the phonological, orthographic, and prosodic demands of each language family.
+    </p>
+    <p>
+      <strong>Customer support and structured data remain an unsolved problem.</strong> The highest defect rates in the evaluation come from IVR, banking, and e-commerce content — content where numbers, identifiers, and transactional language must be rendered exactly. This is not a language-specific problem; it appears across all six languages. It represents a gap between what TTS models are good at (natural conversational speech) and what enterprise deployments actually require.
+    </p>
+    <p>
+      <strong>Human-annotated defect data is qualitatively different from automated metrics.</strong> Comments in this dataset document failure patterns that word error rate or character error rate would not capture: tone register mismatches, filler word timing failures, hallucinated laugh sounds, number reading register errors. These are the kinds of failures that make a product feel broken to real users. They do not reliably appear in automated TTS benchmarks.
+    </p>
+
+    <div class="highlight-box">
+      <p>
+        The leaderboard at <strong><a href="https://voicearena.com" style="color: var(--amber); border-color: rgba(240,164,69,0.3);">voicearena.com</a></strong> reflects the ongoing evaluation. New models are added as they become available. The data in this post covers a specific evaluation round; model rankings may update as more votes are collected. All evaluation methodology is documented at <a href="https://voicearena.com/tts-methodology" style="color: var(--amber); border-color: rgba(240,164,69,0.3);">voicearena.com/tts-methodology</a>.
+      </p>
+    </div>
+  </section>
+
+  <!-- METHODOLOGY NOTE -->
+  <div class="methodology">
+    <div class="methodology-title">// Methodology Note</div>
+    <p>
+      This analysis covers 44,387 approved pairwise votes collected across six evaluation batches: en-US (6,193 votes), hi-IN (9,363), ar-MSA (9,399), ja-JP (6,598), pt-BR (7,695), and vi-VN (5,139). All votes were approved through VoiceArena's quality review process before inclusion. Models evaluated include Google DeepMind Gemini 3.1 Flash TTS, ElevenLabs Eleven v3, OpenAI gpt-4o-mini-tts, Cartesia Sonic-3, Microsoft Azure Dragon HD Omni, xAI Grok TTS, MiniMax Speech 2.8 HD, Fish Audio S2 Pro (en-US only), and Sarvam AI Bulbul-V3 (hi-IN only). Win rates exclude ties. Defect rates are normalized by model appearances per language (total evaluations in which the model was assigned to side A or side B), not by total votes. A single evaluation can carry multiple defect tags. All model matchups are anonymized to evaluators. Human comments are reproduced verbatim; translations in parentheses are editorial.
+    </p>
+  </div>
+
+  <!-- FOOTNOTES -->
+  <div class="footnotes">
+    <p>VoiceArena is built by <a href="https://ai.joshtalks.com">Josh Talks AI</a>, which works on voice and speech datasets, evaluations, and AI infrastructure for model builders and AI labs. Questions about the evaluation methodology or data can be directed to the team via the website.</p>
+  </div>
+
+</main>
+
+<!-- FOOTER -->
+<footer>
+  <p>
+    <a href="https://voicearena.com">voicearena.com</a> &nbsp;·&nbsp;
+    <a href="https://ai.joshtalks.com">Josh Talks AI</a> &nbsp;·&nbsp;
+    <a href="https://voicearena.com/tts-methodology">Methodology</a>
+    &nbsp;·&nbsp; © 2026 Josh Talks AI. Data collected under VoiceArena evaluation protocol.
+  </p>
+</footer>
+
+</body>
+</html>
